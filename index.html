@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT IDS Dashboard</title>
+    <script>
+        function scanNetwork() {
+            let network = document.getElementById("network").value;
+            fetch("/scan", {
+                method: "POST",
+                body: new URLSearchParams({ "network": network }),
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                let resultDiv = document.getElementById("results");
+                resultDiv.innerHTML = "<h3>Devices Found:</h3>";
+                data.forEach(device => {
+                    resultDiv.innerHTML += `<p><b>IP:</b> ${device.IP} | <b>MAC:</b> ${device.MAC}</p>`;
+                });
+            });
+        }
+
+        function analyzeTraffic() {
+            let interface = document.getElementById("interface").value;
+            fetch("/analyze", {
+                method: "POST",
+                body: new URLSearchParams({ "interface": interface }),
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                let resultDiv = document.getElementById("analysis");
+                resultDiv.innerHTML = "<h3>Intrusion Detection Results:</h3>";
+                data.forEach(status => {
+                    resultDiv.innerHTML += `<p>${status}</p>`;
+                });
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>IoT Intrusion Detection System</h1>
+    <input type="text" id="network" placeholder="Enter Network (e.g., 192.168.1.1/24)">
+    <button onclick="scanNetwork()">Scan Devices</button>
+    <div id="results"></div>
+    
+    <input type="text" id="interface" placeholder="Enter Network Interface (e.g., wlan0)">
+    <button onclick="analyzeTraffic()">Analyze Traffic</button>
+    <div id="analysis"></div>
+</body>
+</html>

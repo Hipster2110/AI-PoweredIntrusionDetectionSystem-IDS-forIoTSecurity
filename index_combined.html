@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT IDS Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+    <script>
+        var socket = io();
+
+        socket.on("threat_alert", function(data) {
+            let alertDiv = document.getElementById("alerts");
+            alertDiv.innerHTML += `<p style="color: red;"><b>🚨 Threat Detected:</b> Suspicious activity from ${data.ip}</p>`;
+        });
+
+        function scanNetwork() {
+            let network = document.getElementById("network").value;
+            fetch("/scan", {
+                method: "POST",
+                body: new URLSearchParams({ "network": network }),
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                let resultDiv = document.getElementById("results");
+                resultDiv.innerHTML = "<h3>Devices Found:</h3>";
+                data.forEach(device => {
+                    resultDiv.innerHTML += `<p><b>IP:</b> ${device.IP} | <b>MAC:</b> ${device.MAC}</p>`;
+                });
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>IoT Intrusion Detection System</h1>
+    <input type="text" id="network" placeholder="Enter Network (e.g., 192.168.1.1/24)">
+    <button onclick="scanNetwork()">Scan Devices</button>
+    <div id="results"></div>
+
+    <h2>Real-Time Alerts</h2>
+    <div id="alerts"></div>
+</body>
+</html>
